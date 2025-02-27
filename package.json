@@ -1,0 +1,23 @@
+{
+  "name": "tokenheim",
+  "version": "1.0.0",
+  "description": "A token-based dungeon crawler Telegram Mini App",
+  "main": "src/server/index.js",
+  "scripts": {
+    "start": "node src/server/index.js",
+    "dev": "nodemon src/server/index.js",
+    "build": "webpack --mode production"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "dotenv": "^16.3.1",
+    "ws": "^8.14.2",
+    "node-telegram-bot-api": "^0.64.0",
+    "crypto": "^1.0.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1",
+    "webpack": "^5.88.2",
+    "webpack-cli": "^5.1.4"
+  }
+}
