@@ -8,14 +8,14 @@ class SpinnerGame {
         this.maxHistory = 10;
         this.symbols = ['🍎', '🍊', '🍇', '🍓', '💎', '⭐', '7️⃣', '🎰'];
         this.symbolValues = {
-            '🍎': 1,
-            '🍊': 1.5,
-            '🍇': 2,
-            '🍓': 2.5,
-            '💎': 5,
-            '⭐': 10,
-            '7️⃣': 15,
-            '🎰': 20
+            '🍎': 2,    // Base win 2x
+            '🍊': 3,    // Base win 3x
+            '🍇': 4,    // Base win 4x
+            '🍓': 5,    // Base win 5x
+            '💎': 10,   // Base win 10x
+            '⭐': 15,   // Base win 15x
+            '7️⃣': 20,   // Base win 20x
+            '🎰': 50    // Base win 50x
         };
 
         this.initializeElements();
@@ -54,6 +54,7 @@ class SpinnerGame {
     }
 
     createSpinnerContent(spinner) {
+        spinner.innerHTML = ''; // Clear existing content
         const content = document.createElement('div');
         content.className = 'spinner-content';
         this.symbols.forEach(symbol => {
@@ -66,7 +67,12 @@ class SpinnerGame {
     }
 
     setupEventListeners() {
-        this.spinButton.addEventListener('click', () => this.spin());
+        this.spinButton.addEventListener('click', () => {
+            if (!this.isSpinning) {
+                this.spin();
+            }
+        });
+        
         this.decreaseBetBtn.addEventListener('click', () => this.adjustBet(-10));
         this.increaseBetBtn.addEventListener('click', () => this.adjustBet(10));
         this.decreaseMultiBtn.addEventListener('click', () => this.adjustMultiplier(-1));
@@ -107,6 +113,7 @@ class SpinnerGame {
         if (this.isSpinning || this.currentBet * this.currentMultiplier > this.tokens) return;
 
         this.isSpinning = true;
+        this.spinButton.disabled = true;
         this.tokens -= this.currentBet * this.currentMultiplier;
         this.updateDisplay();
 
@@ -120,54 +127,82 @@ class SpinnerGame {
 
         this.addToHistory(results, winAmount);
         this.updateDisplay();
+        
+        // Save game result for dashboard
+        localStorage.setItem('gameResult', JSON.stringify({
+            tokens: this.tokens,
+            win: winAmount,
+            symbols: results
+        }));
+
         this.isSpinning = false;
+        this.spinButton.disabled = false;
     }
 
     async animateSpinners() {
-        const spinDurations = [2000, 2200, 2400]; // Different durations for each spinner
         const results = [];
-
-        const animations = this.spinners.map((spinner, index) => {
+        const promises = this.spinners.map((spinner, index) => {
             return new Promise(resolve => {
                 const content = spinner.querySelector('.spinner-content');
-                const symbolHeight = spinner.offsetHeight / 3;
-                let currentOffset = 0;
+                const duration = 2000 + (index * 200); // Staggered stop times
+                const startTime = performance.now();
+                
+                const animate = (currentTime) => {
+                    const elapsed = currentTime - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    
+                    // Easing function for smooth slowdown
+                    const easeOut = 1 - Math.pow(1 - progress, 3);
+                    
+                    // Calculate total spins based on duration
+                    const totalSpins = 5 + index;
+                    const currentRotation = (totalSpins * easeOut) * (this.symbols.length * 100);
+                    
+                    content.style.transform = `translateY(${-currentRotation % (100 * this.symbols.length)}px)`;
 
-                const animate = (timestamp) => {
-                    currentOffset = (currentOffset + 10) % (symbolHeight * this.symbols.length);
-                    content.style.transform = `translateY(${-currentOffset}px)`;
-
-                    if (timestamp < startTime + spinDurations[index]) {
+                    if (progress < 1) {
                         requestAnimationFrame(animate);
                     } else {
-                        // Snap to final position
+                        // Select final symbol
                         const finalSymbol = this.symbols[Math.floor(Math.random() * this.symbols.length)];
                         const finalIndex = this.symbols.indexOf(finalSymbol);
-                        content.style.transform = `translateY(${-finalIndex * symbolHeight}px)`;
+                        content.style.transform = `translateY(${-finalIndex * 100}px)`;
                         results[index] = finalSymbol;
                         resolve();
                     }
                 };
 
-                const startTime = performance.now();
                 requestAnimationFrame(animate);
             });
         });
 
-        await Promise.all(animations);
+        await Promise.all(promises);
         return results;
     }
 
     calculateWin(results) {
-        // Check for matches
-        if (results[0] === results[1] && results[1] === results[2]) {
+        let winMultiplier = 0;
+        
+        // Count symbol occurrences
+        const symbolCount = results.reduce((count, symbol) => {
+            count[symbol] = (count[symbol] || 0) + 1;
+            return count;
+        }, {});
+
+        // Find the most frequent symbol
+        const maxCount = Math.max(...Object.values(symbolCount));
+        const winningSymbol = Object.keys(symbolCount).find(symbol => symbolCount[symbol] === maxCount);
+
+        // Calculate win based on matches
+        if (maxCount === 3) {
             // Three of a kind
-            return this.currentBet * this.currentMultiplier * this.symbolValues[results[0]] * 3;
-        } else if (results[0] === results[1] || results[1] === results[2] || results[0] === results[2]) {
+            winMultiplier = this.symbolValues[winningSymbol] * 3;
+        } else if (maxCount === 2) {
             // Two of a kind
-            return this.currentBet * this.currentMultiplier * 1.5;
+            winMultiplier = this.symbolValues[winningSymbol] * 1.5;
         }
-        return 0;
+
+        return Math.floor(this.currentBet * this.currentMultiplier * winMultiplier);
     }
 
     showWinPopup(amount) {

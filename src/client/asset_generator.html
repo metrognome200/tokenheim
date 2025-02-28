@@ -49,6 +49,9 @@
 <body>
     <h1>Tokenheim Spinner Asset Generator</h1>
     
+    <h2>Spinner Symbols</h2>
+    <div class="generator-container" id="spinner-symbols"></div>
+    
     <h2>UI Icons</h2>
     <div class="generator-container" id="ui-icons"></div>
     
@@ -58,6 +61,17 @@
     <script>
         class AssetGenerator {
             constructor() {
+                this.spinnerSymbols = {
+                    apple: { emoji: '🍎', color: '#ff6b6b', size: 100, value: '2x' },
+                    orange: { emoji: '🍊', color: '#ffa502', size: 100, value: '3x' },
+                    grape: { emoji: '🍇', color: '#9b59b6', size: 100, value: '4x' },
+                    strawberry: { emoji: '🍓', color: '#e84393', size: 100, value: '5x' },
+                    diamond: { emoji: '💎', color: '#00a8ff', size: 100, value: '10x' },
+                    star: { emoji: '⭐', color: '#ffd700', size: 100, value: '15x' },
+                    seven: { emoji: '7️⃣', color: '#ff4757', size: 100, value: '20x' },
+                    jackpot: { emoji: '🎰', color: '#2ed573', size: 100, value: '50x' }
+                };
+
                 this.uiIcons = {
                     token: { emoji: '🪙', color: '#ffd700', size: 48 },
                     multiplier: { emoji: '✨', color: '#ff6b6b', size: 48 },
@@ -76,6 +90,7 @@
             }
 
             init() {
+                this.generateSpinnerSymbols();
                 this.generateUIIcons();
                 this.generateAchievementIcons();
             }
@@ -87,21 +102,31 @@
                 return canvas;
             }
 
-            drawIcon(ctx, emoji, color, size) {
-                // Background circle
-                ctx.beginPath();
-                ctx.arc(size/2, size/2, size/2 - 2, 0, Math.PI * 2);
-                ctx.fillStyle = color;
-                ctx.fill();
+            drawSymbol(ctx, config) {
+                const { emoji, color, size, value } = config;
+                
+                // Clear background
+                ctx.clearRect(0, 0, size, size);
 
-                // Add subtle gradient
+                // Draw background circle with gradient
                 const gradient = ctx.createRadialGradient(
-                    size/2, size/2 - size/4, size/8,
+                    size/2, size/2, 0,
                     size/2, size/2, size/2
                 );
-                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
-                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.1)');
+                gradient.addColorStop(0, color);
+                gradient.addColorStop(1, this.adjustColor(color, -30));
+                
+                ctx.beginPath();
+                ctx.arc(size/2, size/2, size/2 - 2, 0, Math.PI * 2);
                 ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Add shine effect
+                const shine = ctx.createLinearGradient(0, 0, size, size);
+                shine.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+                shine.addColorStop(0.5, 'rgba(255, 255, 255, 0)');
+                shine.addColorStop(1, 'rgba(255, 255, 255, 0.2)');
+                ctx.fillStyle = shine;
                 ctx.fill();
 
                 // Draw emoji
@@ -110,48 +135,88 @@
                 ctx.textBaseline = 'middle';
                 ctx.fillText(emoji, size/2, size/2);
 
-                // Add shine effect
-                ctx.beginPath();
-                ctx.ellipse(
-                    size/4, size/4,
-                    size/8, size/16,
-                    -Math.PI/4,
-                    0, Math.PI * 2
-                );
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-                ctx.fill();
+                // Draw value label if provided
+                if (value) {
+                    ctx.font = 'bold 16px Arial';
+                    ctx.fillStyle = 'white';
+                    ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
+                    ctx.lineWidth = 3;
+                    ctx.strokeText(value, size/2, size - 15);
+                    ctx.fillText(value, size/2, size - 15);
+                }
             }
 
-            generateIcon(name, config, container) {
-                const div = document.createElement('div');
-                div.className = 'asset-item';
-                div.innerHTML = `<h3>${name}</h3>`;
+            adjustColor(color, amount) {
+                const hex = color.replace('#', '');
+                const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+                const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+                const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+                return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+            }
 
-                const canvas = this.createCanvas(config.size, config.size);
-                const ctx = canvas.getContext('2d');
-                this.drawIcon(ctx, config.emoji, config.color, config.size);
-                
-                div.appendChild(canvas);
+            generateSpinnerSymbols() {
+                const container = document.getElementById('spinner-symbols');
+                for (const [name, config] of Object.entries(this.spinnerSymbols)) {
+                    const div = document.createElement('div');
+                    div.className = 'asset-item';
+                    div.innerHTML = `<h3>${name} (${config.value})</h3>`;
 
-                const downloadBtn = document.createElement('button');
-                downloadBtn.textContent = 'Download';
-                downloadBtn.onclick = () => this.downloadCanvas(canvas, name);
-                div.appendChild(downloadBtn);
+                    const canvas = this.createCanvas(config.size, config.size);
+                    const ctx = canvas.getContext('2d');
+                    this.drawSymbol(ctx, config);
+                    
+                    div.appendChild(canvas);
 
-                container.appendChild(div);
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.textContent = 'Download';
+                    downloadBtn.onclick = () => this.downloadCanvas(canvas, name);
+                    div.appendChild(downloadBtn);
+
+                    container.appendChild(div);
+                }
             }
 
             generateUIIcons() {
                 const container = document.getElementById('ui-icons');
                 for (const [name, config] of Object.entries(this.uiIcons)) {
-                    this.generateIcon(name, config, container);
+                    const div = document.createElement('div');
+                    div.className = 'asset-item';
+                    div.innerHTML = `<h3>${name}</h3>`;
+
+                    const canvas = this.createCanvas(config.size, config.size);
+                    const ctx = canvas.getContext('2d');
+                    this.drawSymbol(ctx, config);
+                    
+                    div.appendChild(canvas);
+
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.textContent = 'Download';
+                    downloadBtn.onclick = () => this.downloadCanvas(canvas, name);
+                    div.appendChild(downloadBtn);
+
+                    container.appendChild(div);
                 }
             }
 
             generateAchievementIcons() {
                 const container = document.getElementById('achievement-icons');
                 for (const [name, config] of Object.entries(this.achievementIcons)) {
-                    this.generateIcon(name, config, container);
+                    const div = document.createElement('div');
+                    div.className = 'asset-item';
+                    div.innerHTML = `<h3>${name}</h3>`;
+
+                    const canvas = this.createCanvas(config.size, config.size);
+                    const ctx = canvas.getContext('2d');
+                    this.drawSymbol(ctx, config);
+                    
+                    div.appendChild(canvas);
+
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.textContent = 'Download';
+                    downloadBtn.onclick = () => this.downloadCanvas(canvas, name);
+                    div.appendChild(downloadBtn);
+
+                    container.appendChild(div);
                 }
             }
 
