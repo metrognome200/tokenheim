@@ -3,78 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tokenheim</title>
+    <title>Tokenheim Spinner</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="styles/main.css">
 </head>
-<body class="dashboard-page">
+<body>
     <div class="dashboard-container">
         <header class="dashboard-header">
-            <h1>Tokenheim</h1>
+            <h1>Tokenheim Spinner</h1>
             <div class="player-info">
-                <div class="player-avatar">
-                    <img src="assets/ui/avatar-placeholder.png" alt="Player Avatar" id="player-avatar">
-                    <div class="level-badge" id="player-level">1</div>
+                <div class="stat-item">
+                    <img src="assets/ui/token.png" alt="Tokens" class="stat-icon">
+                    <span id="total-tokens">1000</span>
                 </div>
-                <div class="player-details">
-                    <h2 id="player-name">Warrior</h2>
-                    <div class="player-stats">
-                        <span class="stat">
-                            <img src="assets/ui/token.png" alt="Tokens" class="stat-icon">
-                            <span id="total-tokens">0</span>
-                        </span>
-                        <span class="stat">
-                            <img src="assets/ui/level.png" alt="Level" class="stat-icon">
-                            <span id="exp-points">0</span> XP
-                        </span>
-                    </div>
+                <div class="stat-item">
+                    <img src="assets/ui/trophy.png" alt="Level" class="stat-icon">
+                    <span id="player-level">1</span>
                 </div>
             </div>
         </header>
 
-        <main class="dashboard-main">
-            <section class="quick-actions">
-                <button class="action-btn primary-btn" onclick="window.location.href='game.html'">
-                    <span class="btn-icon">▶️</span>
-                    Play Now
-                </button>
-                <button class="action-btn" onclick="openInventory()">
-                    <span class="btn-icon">🎒</span>
-                    Inventory
-                </button>
-                <button class="action-btn" onclick="openShop()">
-                    <span class="btn-icon">🏪</span>
-                    Shop
-                </button>
-            </section>
+        <div class="dashboard-content">
+            <div class="quick-stats">
+                <div class="stat-card">
+                    <h3>Biggest Win</h3>
+                    <span id="biggest-win">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Spins</h3>
+                    <span id="total-spins">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Win Rate</h3>
+                    <span id="win-rate">0%</span>
+                </div>
+            </div>
 
-            <section class="progress-section">
-                <h3>Current Progress</h3>
-                <div class="progress-stats">
-                    <div class="stat-card">
-                        <h4>Dungeons Cleared</h4>
-                        <span id="dungeons-cleared">0</span>
+            <div class="action-buttons">
+                <button id="play-btn" class="main-button" onclick="window.location.href='game.html'">
+                    <img src="assets/ui/play.png" alt="Play">
+                    <span>Play Now</span>
+                </button>
+                <button id="shop-btn" class="main-button" onclick="window.location.href='shop.html'">
+                    <img src="assets/ui/shop.png" alt="Shop">
+                    <span>Shop</span>
+                </button>
+            </div>
+
+            <div class="recent-activity">
+                <h2>Recent Activity</h2>
+                <div id="activity-feed">
+                    <!-- Will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <div class="achievements">
+                <h2>Achievements</h2>
+                <div class="achievement-grid">
+                    <div class="achievement" data-tooltip="Win 1000 tokens in one spin">
+                        <img src="assets/achievements/big_win.png" alt="Big Winner">
+                        <div class="achievement-progress">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h4>Enemies Defeated</h4>
-                        <span id="enemies-defeated">0</span>
+                    <div class="achievement" data-tooltip="Get three 7s in a row">
+                        <img src="assets/achievements/jackpot.png" alt="Jackpot">
+                        <div class="achievement-progress">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <h4>Tokens Collected</h4>
-                        <span id="tokens-collected">0</span>
+                    <div class="achievement" data-tooltip="Win 5 times in a row">
+                        <img src="assets/achievements/streak.png" alt="Hot Streak">
+                        <div class="achievement-progress">
+                            <div class="progress-bar" style="width: 0%"></div>
+                        </div>
                     </div>
                 </div>
-            </section>
-
-            <section class="achievements-section">
-                <h3>Recent Achievements</h3>
-                <div class="achievements-list" id="achievements-container">
-                    <!-- Achievements will be populated by JavaScript -->
-                </div>
-            </section>
-        </main>
+            </div>
+        </div>
     </div>
-    <script src="js/telegram.js"></script>
+
     <script src="js/dashboard.js"></script>
 </body>
 </html>

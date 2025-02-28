@@ -3,42 +3,74 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tokenheim - Game</title>
+    <title>Tokenheim - Spinner</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="styles/main.css">
 </head>
 <body class="game-page">
     <div id="game-container">
-        <canvas id="gameCanvas"></canvas>
-        <div id="ui-overlay">
-            <div id="player-stats">
+        <div class="game-header">
+            <button id="menu-btn" class="menu-button" onclick="window.location.href='index.html'">←</button>
+            <div class="player-stats">
                 <div class="stat-item">
                     <img src="assets/ui/token.png" alt="Tokens" class="stat-icon">
-                    <span id="tokens">0</span>
+                    <span id="tokens">1000</span>
                 </div>
                 <div class="stat-item">
-                    <img src="assets/ui/health.png" alt="Health" class="stat-icon">
-                    <span id="health">100</span>
-                </div>
-                <div class="stat-item">
-                    <img src="assets/ui/level.png" alt="Level" class="stat-icon">
-                    <span id="level">1</span>
+                    <img src="assets/ui/multiplier.png" alt="Multiplier" class="stat-icon">
+                    <span id="multiplier">x1</span>
                 </div>
             </div>
-            <div id="action-buttons" class="game-controls">
-                <button id="attack-btn" class="game-btn">⚔️</button>
-                <button id="block-btn" class="game-btn">🛡️</button>
-                <button id="special-btn" class="game-btn">✨</button>
+        </div>
+
+        <div class="spinner-container">
+            <div class="spinner-wrapper">
+                <div id="spinner1" class="spinner"></div>
+                <div id="spinner2" class="spinner"></div>
+                <div id="spinner3" class="spinner"></div>
+            </div>
+            
+            <div class="controls">
+                <div class="bet-controls">
+                    <button id="decrease-bet" class="bet-btn">-</button>
+                    <div class="bet-amount">
+                        <span>Bet:</span>
+                        <span id="current-bet">10</span>
+                    </div>
+                    <button id="increase-bet" class="bet-btn">+</button>
+                </div>
+                
+                <button id="spin-btn" class="spin-button">SPIN</button>
+                
+                <div class="multiplier-controls">
+                    <button id="decrease-multi" class="multi-btn">-</button>
+                    <div class="multiplier-amount">
+                        <span>Multi:</span>
+                        <span id="current-multi">x1</span>
+                    </div>
+                    <button id="increase-multi" class="multi-btn">+</button>
+                </div>
             </div>
         </div>
-        <div id="inventory" class="hidden">
-            <h2>Inventory</h2>
-            <div id="inventory-grid"></div>
+
+        <div class="recent-spins">
+            <h3>Recent Spins</h3>
+            <div id="spin-history" class="spin-history">
+                <!-- Will be populated by JavaScript -->
+            </div>
         </div>
-        <button id="menu-btn" class="menu-button">≡</button>
+
+        <div id="win-popup" class="popup hidden">
+            <div class="popup-content">
+                <h2>🎉 Big Win! 🎉</h2>
+                <div class="win-amount">
+                    <span id="win-amount">0</span>
+                    <span>Tokens</span>
+                </div>
+                <button id="collect-btn">Collect</button>
+            </div>
+        </div>
     </div>
-    <script src="js/telegram.js"></script>
-    <script src="js/game.js"></script>
-    <script src="js/ui.js"></script>
+    <script src="js/spinner.js"></script>
 </body>
 </html>

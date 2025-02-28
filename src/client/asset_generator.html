@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asset Generator - Tokenheim Spinner</title>
+    <style>
+        body {
+            background: #1a1a2e;
+            color: white;
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        .generator-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+        .asset-item {
+            background: #2a2a4a;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        canvas {
+            margin: 10px 0;
+            background: #ffffff;
+            border-radius: 5px;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        h2 {
+            color: #ff6b6b;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Tokenheim Spinner Asset Generator</h1>
+    
+    <h2>UI Icons</h2>
+    <div class="generator-container" id="ui-icons"></div>
+    
+    <h2>Achievement Icons</h2>
+    <div class="generator-container" id="achievement-icons"></div>
+
+    <script>
+        class AssetGenerator {
+            constructor() {
+                this.uiIcons = {
+                    token: { emoji: '🪙', color: '#ffd700', size: 48 },
+                    multiplier: { emoji: '✨', color: '#ff6b6b', size: 48 },
+                    play: { emoji: '▶️', color: '#4CAF50', size: 48 },
+                    shop: { emoji: '🏪', color: '#2196F3', size: 48 },
+                    trophy: { emoji: '🏆', color: '#ffd700', size: 48 }
+                };
+
+                this.achievementIcons = {
+                    big_win: { emoji: '💰', color: '#ffd700', size: 64 },
+                    jackpot: { emoji: '7️⃣', color: '#ff6b6b', size: 64 },
+                    streak: { emoji: '🔥', color: '#ff9800', size: 64 }
+                };
+
+                this.init();
+            }
+
+            init() {
+                this.generateUIIcons();
+                this.generateAchievementIcons();
+            }
+
+            createCanvas(width, height) {
+                const canvas = document.createElement('canvas');
+                canvas.width = width;
+                canvas.height = height;
+                return canvas;
+            }
+
+            drawIcon(ctx, emoji, color, size) {
+                // Background circle
+                ctx.beginPath();
+                ctx.arc(size/2, size/2, size/2 - 2, 0, Math.PI * 2);
+                ctx.fillStyle = color;
+                ctx.fill();
+
+                // Add subtle gradient
+                const gradient = ctx.createRadialGradient(
+                    size/2, size/2 - size/4, size/8,
+                    size/2, size/2, size/2
+                );
+                gradient.addColorStop(0, 'rgba(255, 255, 255, 0.2)');
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.1)');
+                ctx.fillStyle = gradient;
+                ctx.fill();
+
+                // Draw emoji
+                ctx.font = `${size/1.5}px Arial`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(emoji, size/2, size/2);
+
+                // Add shine effect
+                ctx.beginPath();
+                ctx.ellipse(
+                    size/4, size/4,
+                    size/8, size/16,
+                    -Math.PI/4,
+                    0, Math.PI * 2
+                );
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.fill();
+            }
+
+            generateIcon(name, config, container) {
+                const div = document.createElement('div');
+                div.className = 'asset-item';
+                div.innerHTML = `<h3>${name}</h3>`;
+
+                const canvas = this.createCanvas(config.size, config.size);
+                const ctx = canvas.getContext('2d');
+                this.drawIcon(ctx, config.emoji, config.color, config.size);
+                
+                div.appendChild(canvas);
+
+                const downloadBtn = document.createElement('button');
+                downloadBtn.textContent = 'Download';
+                downloadBtn.onclick = () => this.downloadCanvas(canvas, name);
+                div.appendChild(downloadBtn);
+
+                container.appendChild(div);
+            }
+
+            generateUIIcons() {
+                const container = document.getElementById('ui-icons');
+                for (const [name, config] of Object.entries(this.uiIcons)) {
+                    this.generateIcon(name, config, container);
+                }
+            }
+
+            generateAchievementIcons() {
+                const container = document.getElementById('achievement-icons');
+                for (const [name, config] of Object.entries(this.achievementIcons)) {
+                    this.generateIcon(name, config, container);
+                }
+            }
+
+            downloadCanvas(canvas, name) {
+                const link = document.createElement('a');
+                link.download = `${name}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+        }
+
+        // Initialize the generator when the page loads
+        window.addEventListener('load', () => {
+            new AssetGenerator();
+        });
+    </script>
+</body>
+</html>
