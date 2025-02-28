@@ -12,6 +12,15 @@ class Game {
         this.currentRoom = null;
         this.enemies = [];
         this.sprites = {};
+        this.touchControls = {
+            joystick: {
+                active: false,
+                startX: 0,
+                startY: 0,
+                moveX: 0,
+                moveY: 0
+            }
+        };
         this.setupCanvas();
         this.setupEventListeners();
         this.loadAssets();
@@ -32,6 +41,10 @@ class Game {
         document.getElementById('attack-btn').addEventListener('click', () => this.attack());
         document.getElementById('block-btn').addEventListener('click', () => this.block());
         document.getElementById('special-btn').addEventListener('click', () => this.useSpecial());
+
+        this.canvas.addEventListener('touchstart', (e) => this.handleTouchStart(e));
+        this.canvas.addEventListener('touchmove', (e) => this.handleTouchMove(e));
+        this.canvas.addEventListener('touchend', () => this.handleTouchEnd());
     }
 
     handleInput(e) {
@@ -57,6 +70,49 @@ class Game {
                 this.toggleInventory();
                 break;
         }
+    }
+
+    handleTouchStart(e) {
+        e.preventDefault();
+        const touch = e.touches[0];
+        const rect = this.canvas.getBoundingClientRect();
+        
+        // If touch is in the left half of screen, it's for movement
+        if (touch.clientX < rect.width / 2) {
+            this.touchControls.joystick.active = true;
+            this.touchControls.joystick.startX = touch.clientX;
+            this.touchControls.joystick.startY = touch.clientY;
+            this.touchControls.joystick.moveX = touch.clientX;
+            this.touchControls.joystick.moveY = touch.clientY;
+        }
+    }
+
+    handleTouchMove(e) {
+        e.preventDefault();
+        if (this.touchControls.joystick.active) {
+            const touch = e.touches[0];
+            this.touchControls.joystick.moveX = touch.clientX;
+            this.touchControls.joystick.moveY = touch.clientY;
+            
+            // Calculate movement based on joystick position
+            const deltaX = this.touchControls.joystick.moveX - this.touchControls.joystick.startX;
+            const deltaY = this.touchControls.joystick.moveY - this.touchControls.joystick.startY;
+            const speed = 5;
+            const maxDistance = 50; // Maximum joystick distance
+
+            // Normalize movement
+            const distance = Math.sqrt(deltaX * deltaX + deltaY * deltaY);
+            const normalizedSpeed = Math.min(distance, maxDistance) / maxDistance * speed;
+
+            if (distance > 0) {
+                this.player.x += (deltaX / distance) * normalizedSpeed;
+                this.player.y += (deltaY / distance) * normalizedSpeed;
+            }
+        }
+    }
+
+    handleTouchEnd() {
+        this.touchControls.joystick.active = false;
     }
 
     generateRoom() {
@@ -229,6 +285,11 @@ class Game {
                 this.ctx.fillRect(token.x, token.y, 20, 20);
             }
         });
+
+        // Draw virtual joystick when active
+        if (this.touchControls.joystick.active) {
+            this.drawJoystick();
+        }
     }
 
     drawRoom() {
@@ -245,6 +306,20 @@ class Game {
                 break;
         }
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
+    drawJoystick() {
+        // Draw joystick base
+        this.ctx.beginPath();
+        this.ctx.arc(this.touchControls.joystick.startX, this.touchControls.joystick.startY, 50, 0, Math.PI * 2);
+        this.ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+        this.ctx.stroke();
+
+        // Draw joystick stick
+        this.ctx.beginPath();
+        this.ctx.arc(this.touchControls.joystick.moveX, this.touchControls.joystick.moveY, 25, 0, Math.PI * 2);
+        this.ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        this.ctx.fill();
     }
 
     gameLoop() {

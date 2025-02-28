@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokenheim - Shop</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/shop.css">
+</head>
+<body class="shop-page">
+    <div class="shop-container">
+        <header class="shop-header">
+            <button class="back-btn" onclick="window.location.href='index.html'">←</button>
+            <h1>Token Shop</h1>
+            <div class="player-currency">
+                <img src="assets/ui/token.png" alt="Tokens" class="currency-icon">
+                <span id="player-tokens">0</span>
+            </div>
+        </header>
+
+        <div class="shop-categories">
+            <button class="category-btn active" data-category="weapons">Weapons</button>
+            <button class="category-btn" data-category="armor">Armor</button>
+            <button class="category-btn" data-category="potions">Potions</button>
+            <button class="category-btn" data-category="special">Special</button>
+        </div>
+
+        <main class="shop-items" id="shop-items">
+            <!-- Items will be populated by JavaScript -->
+        </main>
+
+        <div id="purchase-modal" class="modal hidden">
+            <div class="modal-content">
+                <h2>Confirm Purchase</h2>
+                <div class="item-preview">
+                    <img id="modal-item-image" src="" alt="Item">
+                    <div class="item-details">
+                        <h3 id="modal-item-name"></h3>
+                        <p id="modal-item-description"></p>
+                        <div class="item-price">
+                            <img src="assets/ui/token.png" alt="Tokens" class="currency-icon">
+                            <span id="modal-item-price"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button id="confirm-purchase" class="primary-btn">Purchase</button>
+                    <button id="cancel-purchase" class="secondary-btn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/shop.js"></script>
+</body>
+</html>

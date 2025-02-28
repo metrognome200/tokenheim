@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tokenheim - Game</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link rel="stylesheet" href="styles/main.css">
+</head>
+<body class="game-page">
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-overlay">
+            <div id="player-stats">
+                <div class="stat-item">
+                    <img src="assets/ui/token.png" alt="Tokens" class="stat-icon">
+                    <span id="tokens">0</span>
+                </div>
+                <div class="stat-item">
+                    <img src="assets/ui/health.png" alt="Health" class="stat-icon">
+                    <span id="health">100</span>
+                </div>
+                <div class="stat-item">
+                    <img src="assets/ui/level.png" alt="Level" class="stat-icon">
+                    <span id="level">1</span>
+                </div>
+            </div>
+            <div id="action-buttons" class="game-controls">
+                <button id="attack-btn" class="game-btn">⚔️</button>
+                <button id="block-btn" class="game-btn">🛡️</button>
+                <button id="special-btn" class="game-btn">✨</button>
+            </div>
+        </div>
+        <div id="inventory" class="hidden">
+            <h2>Inventory</h2>
+            <div id="inventory-grid"></div>
+        </div>
+        <button id="menu-btn" class="menu-button">≡</button>
+    </div>
+    <script src="js/telegram.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>
